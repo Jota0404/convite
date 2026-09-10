@@ -1,170 +1,282 @@
-const FORM_ACTION='https://docs.google.com/forms/d/e/15Tmdnja8xotos4jWNKi9zAwMU0MzBwKSiU8Vk3HZdR4/formResponse';
+const answers = {
+  role: '',
+  musica: '',
+  horario: '',
+  comida: '',
+  conta: '',
+  dia: ''
+};
+
+let currentStep = 'intro';
 
 /*
- * O formulário existente tem estas seis perguntas:
- * Tipo de Encontro
- * Estilo de Roupa
- * Transporte
- * Nível de Animação
- * Pedido Especial
- * Dia Escolhido
+ * Google Forms
  *
- * Os nomes abaixo representam essas perguntas no site.
- * Falta apenas substituir os entry.* pelos IDs reais das perguntas.
+ * O endpoint abaixo é o formulário real "Respostas do Convite".
+ * Os IDs entry.* precisam ser os IDs internos das seis perguntas do formulário.
+ * Eles não ficam visíveis no link comum de edição/visualização.
+ *
+ * Quando os IDs forem conhecidos, substitua SOMENTE os valores abaixo, por exemplo:
+ * role: 'entry.123456789'
  */
-const FORM_FIELDS={
-  tipoEncontro:'entry.TIPO_ENCONTRO',
-  estiloRoupa:'entry.ESTILO_ROUPA',
-  transporte:'entry.TRANSPORTE',
-  nivelAnimacao:'entry.NIVEL_ANIMACAO',
-  pedidoEspecial:'entry.PEDIDO_ESPECIAL',
-  data:'entry.DIA_ESCOLHIDO'
+const FORM_ACTION = 'https://docs.google.com/forms/d/e/15Tmdnja8xotos4jWNKi9zAwMU0MzBwKSiU8Vk3HZdR4/formResponse';
+
+const FORM_FIELDS = {
+  role: 'entry.ROLE_ID',
+  musica: 'entry.MUSICA_ID',
+  horario: 'entry.HORARIO_ID',
+  comida: 'entry.COMIDA_ID',
+  conta: 'entry.CONTA_ID',
+  dia: 'entry.DIA_ID'
 };
 
-const answers={
-  tipoEncontro:null,
-  estiloRoupa:null,
-  transporte:null,
-  nivelAnimacao:null,
-  pedidoEspecial:null,
-  data:null
-};
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
 
-let currentStep='intro';
+// NAVEGAÇÃO ENTRE ETAPAS
+function goToStep(step) {
+  $$('.step').forEach((section) => section.classList.remove('active'));
 
-const $=s=>document.querySelector(s);
-const $$=s=>document.querySelectorAll(s);
+  const targetStep = $(`#step-${step}`);
+  if (!targetStep) return;
 
-function showStep(step){
-  $$('.step').forEach(e=>e.classList.remove('active'));
-  const target=$(`#step-${step}`);
-  if(target)target.classList.add('active');
-  currentStep=step;
+  targetStep.classList.add('active');
+  currentStep = step;
   updateProgressBar();
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function updateProgressBar(){
-  const visible=typeof currentStep==='number'&&currentStep>=1&&currentStep<=6;
-  $('#progress-container').classList.toggle('visible',visible);
-  if(!visible)return;
-  $('#progress-bar').style.width=`${((currentStep-1)/5)*100}%`;
-  $$('.dots i').forEach((d,i)=>d.classList.toggle('active',i<currentStep));
+function nextStep(step) {
+  goToStep(step);
 }
 
-$('#btn-intro').onclick=()=>showStep(0);
-
-$('#btn-sim').onclick=()=>showStep(1);
-
-const noButton=$('#btn-nao');
-
-function escapeNo(){
-  const w=innerWidth;
-  const h=innerHeight;
-  const bw=noButton.offsetWidth;
-  const bh=noButton.offsetHeight;
-  noButton.style.position='fixed';
-  noButton.style.left=`${Math.max(10,Math.floor(Math.random()*Math.max(1,w-bw-20)))}px`;
-  noButton.style.top=`${Math.max(10,Math.floor(Math.random()*Math.max(1,h-bh-20)))}px`;
+function prevStep(step) {
+  goToStep(step);
 }
 
-noButton.addEventListener('mouseenter',escapeNo);
-noButton.addEventListener('touchstart',e=>{e.preventDefault();escapeNo()},{passive:false});
-noButton.onclick=e=>{e.preventDefault();escapeNo()};
+// BARRA DE PROGRESSO — visível apenas entre as etapas 1 e 6
+function updateProgressBar() {
+  const progressBar = $('#progress-bar');
+  if (!progressBar) return;
 
-$$('.option-card').forEach(card=>card.addEventListener('click',()=>{
-  const q=card.dataset.question;
-  answers[q]=card.dataset.value;
-  $$(`.option-card[data-question="${q}"]`).forEach(c=>c.classList.remove('selected'));
-  card.classList.add('selected');
+  const visible = typeof currentStep === 'number' && currentStep >= 1 && currentStep <= 6;
+  progressBar.classList.toggle('visible', visible);
 
-  setTimeout(()=>{
-    if(typeof currentStep==='number'&&currentStep<6)showStep(currentStep+1);
-  },250);
-}));
+  if (!visible) return;
 
-function dateOnly(d){
-  return new Date(d.getFullYear(),d.getMonth(),d.getDate());
-}
-
-function iso(d){
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function longDate(d){
-  return new Intl.DateTimeFormat('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(d);
-}
-
-function nextWeekday(base,target){
-  const d=dateOnly(base);
-  let diff=target-d.getDay();
-  if(diff<=0)diff+=7;
-  d.setDate(d.getDate()+diff);
-  return d;
-}
-
-function generateDates(){
-  const box=$('#date-options');
-  const today=dateOnly(new Date());
-  box.innerHTML='';
-
-  [5,6,0].map(day=>nextWeekday(today,day)).forEach(d=>{
-    const b=document.createElement('button');
-    b.type='button';
-    b.className='date-option';
-    b.dataset.date=iso(d);
-    b.innerHTML=`<span><span class="date-weekday">${new Intl.DateTimeFormat('pt-BR',{weekday:'long'}).format(d)}</span><span class="date-full">${longDate(d)}</span></span><span class="check">✓</span>`;
-    b.onclick=()=>selectDate(b.dataset.date,b);
-    box.appendChild(b);
+  const steps = progressBar.querySelectorAll('.progress-step');
+  steps.forEach((element, index) => {
+    element.classList.toggle('active', index < currentStep);
   });
-
-  $('#custom-date').min=iso(today);
 }
 
-function selectDate(value,button){
-  answers.data=value;
-  $('#custom-date').value='';
-  $$('.date-option').forEach(b=>b.classList.remove('selected'));
-  button.classList.add('selected');
-  $('#btn-finalizar').disabled=false;
+// INTRO
+$('#btn-intro')?.addEventListener('click', () => nextStep(0));
+$('#btn-sim')?.addEventListener('click', () => nextStep(1));
+
+// BOTÃO "NÃO" FUJÃO — funciona com mouse, touch e clique
+const btnNao = $('#btn-nao');
+
+function moveNoButton() {
+  if (!btnNao) return;
+
+  const margin = 12;
+  const width = Math.max(btnNao.offsetWidth, 90);
+  const height = Math.max(btnNao.offsetHeight, 50);
+  const maxX = Math.max(margin, window.innerWidth - width - margin);
+  const maxY = Math.max(margin, window.innerHeight - height - margin);
+
+  const x = Math.floor(margin + Math.random() * Math.max(1, maxX - margin));
+  const y = Math.floor(margin + Math.random() * Math.max(1, maxY - margin));
+
+  btnNao.style.position = 'fixed';
+  btnNao.style.left = `${Math.min(x, maxX)}px`;
+  btnNao.style.top = `${Math.min(y, maxY)}px`;
+  btnNao.style.zIndex = '1000';
 }
 
-$('#custom-date').addEventListener('change',e=>{
-  if(!e.target.value)return;
-  answers.data=e.target.value;
-  $$('.date-option').forEach(b=>b.classList.remove('selected'));
-  $('#btn-finalizar').disabled=false;
+btnNao?.addEventListener('mouseenter', moveNoButton);
+btnNao?.addEventListener('touchstart', (event) => {
+  event.preventDefault();
+  moveNoButton();
+}, { passive: false });
+btnNao?.addEventListener('click', (event) => {
+  event.preventDefault();
+  moveNoButton();
 });
 
-async function sendToForm(){
-  const fd=new FormData();
+// SELEÇÃO DE OPÇÕES — etapas 1 a 5
+$$('.option-card').forEach((card) => {
+  card.addEventListener('click', () => {
+    const key = card.dataset.key;
+    const value = card.dataset.val;
+    const step = card.closest('.step');
 
-  Object.entries(FORM_FIELDS).forEach(([key,entry])=>{
-    const value=answers[key];
-    if(/^entry\.[A-Za-z0-9_-]+$/.test(entry)&&value!=null){
-      fd.append(entry,value);
+    if (!key || !step) return;
+
+    step.querySelectorAll('.option-card').forEach((option) => {
+      option.classList.remove('selected');
+    });
+
+    card.classList.add('selected');
+    answers[key] = value || '';
+
+    const nextButton = step.querySelector('.btn-next');
+    if (nextButton) nextButton.disabled = false;
+  });
+});
+
+// NAVEGAÇÃO VOLTAR / AVANÇAR
+$$('[data-prev]').forEach((button) => {
+  button.addEventListener('click', () => prevStep(Number(button.dataset.prev)));
+});
+
+$$('[data-next]').forEach((button) => {
+  button.addEventListener('click', () => {
+    if (!button.disabled) nextStep(Number(button.dataset.next));
+  });
+});
+
+// DATAS
+const customDate = $('#custom-date-input');
+const datesContainer = $('#dates-container');
+const btnFinalizar = $('#btn-finalizar');
+
+function dateOnly(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function toISODate(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('-');
+}
+
+function formatLongDate(date) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(date);
+}
+
+function getNextWeekday(baseDate, targetDay) {
+  const date = dateOnly(baseDate);
+  let difference = targetDay - date.getDay();
+
+  // Sempre mostra a próxima ocorrência do dia, inclusive quando hoje já é esse dia.
+  if (difference <= 0) difference += 7;
+
+  date.setDate(date.getDate() + difference);
+  return date;
+}
+
+function setDateSelection(value) {
+  answers.dia = value;
+  btnFinalizar.disabled = !value;
+}
+
+function selectSuggestedDate(value, button) {
+  $$('.date-option').forEach((option) => option.classList.remove('selected'));
+  button.classList.add('selected');
+
+  if (customDate) customDate.value = '';
+  setDateSelection(value);
+}
+
+function generateDynamicDates() {
+  if (!datesContainer) return;
+
+  const today = dateOnly(new Date());
+  datesContainer.innerHTML = '';
+
+  [5, 6, 0].forEach((targetDay) => {
+    const date = getNextWeekday(today, targetDay);
+    const isoDate = toISODate(date);
+    const label = formatLongDate(date);
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'date-option';
+    button.dataset.date = isoDate;
+    button.innerHTML = `
+      <span class="date-option-content">
+        <span class="date-weekday">${new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date)}</span>
+        <span class="date-full">${label}</span>
+      </span>
+      <span class="check" aria-hidden="true">✓</span>
+    `;
+
+    button.addEventListener('click', () => selectSuggestedDate(isoDate, button));
+    datesContainer.appendChild(button);
+  });
+
+  if (customDate) customDate.min = toISODate(today);
+}
+
+customDate?.addEventListener('change', (event) => {
+  const value = event.target.value;
+
+  if (!value) {
+    setDateSelection('');
+    return;
+  }
+
+  $$('.date-option').forEach((option) => option.classList.remove('selected'));
+  setDateSelection(value);
+});
+
+// ENVIO SILENCIOSO PARA GOOGLE FORMS
+function isPlaceholderField(entry) {
+  return !/^entry\.\d+$/.test(entry);
+}
+
+async function finishForm() {
+  if (!answers.dia || !btnFinalizar) return;
+
+  btnFinalizar.disabled = true;
+  const originalText = btnFinalizar.textContent;
+  btnFinalizar.textContent = 'Enviando... 💌';
+
+  const formData = new FormData();
+  let configuredFields = 0;
+
+  Object.entries(FORM_FIELDS).forEach(([key, entry]) => {
+    const value = answers[key];
+
+    if (value && !isPlaceholderField(entry)) {
+      formData.append(entry, value);
+      configuredFields += 1;
     }
   });
 
-  try{
-    await fetch(FORM_ACTION,{method:'POST',mode:'no-cors',body:fd});
-    return true;
-  }catch(err){
-    console.warn('Falha no envio ao Google Forms',err);
-    return false;
+  // Ainda não há como enviar respostas reais sem os entry.* internos do formulário.
+  // Mesmo assim, mantemos a experiência visual do convite até esses IDs serem configurados.
+  if (configuredFields === 0) {
+    console.warn('Google Forms: os IDs entry.* ainda não foram configurados.');
+    btnFinalizar.textContent = originalText;
+    goToStep(7);
+    return;
+  }
+
+  try {
+    await fetch(FORM_ACTION, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: formData
+    });
+  } catch (error) {
+    console.warn('Falha ao enviar respostas ao Google Forms:', error);
+  } finally {
+    btnFinalizar.textContent = originalText;
+    goToStep(7);
   }
 }
 
-$('#btn-finalizar').onclick=async()=>{
-  if(!answers.data)return;
+btnFinalizar?.addEventListener('click', finishForm);
 
-  const b=$('#btn-finalizar');
-  b.disabled=true;
-  b.textContent='Enviando... 💌';
-
-  await sendToForm();
-  showStep(7);
-};
-
-generateDates();
+generateDynamicDates();
 updateProgressBar();
