@@ -37,7 +37,8 @@ const btnNao = $('#btn-nao');
 const isMobile = () => window.matchMedia('(max-width: 767px)').matches || navigator.maxTouchPoints > 0;
 
 function moveNoButton() {
-  if (!btnNao || isMobile()) return;
+  if (!btnNao) return;
+
   const margin = 12;
   const width = Math.max(btnNao.offsetWidth, 90);
   const height = Math.max(btnNao.offsetHeight, 50);
@@ -45,13 +46,35 @@ function moveNoButton() {
   const maxY = Math.max(margin, window.innerHeight - height - margin);
   const x = Math.floor(margin + Math.random() * Math.max(1, maxX - margin));
   const y = Math.floor(margin + Math.random() * Math.max(1, maxY - margin));
+
   btnNao.style.position = 'fixed';
   btnNao.style.left = `${Math.min(x, maxX)}px`;
   btnNao.style.top = `${Math.min(y, maxY)}px`;
   btnNao.style.zIndex = '1000';
 }
 
-btnNao?.addEventListener('mouseenter', moveNoButton);
+// Desktop: foge quando o cursor chega perto.
+btnNao?.addEventListener('mouseenter', () => {
+  if (!isMobile()) moveNoButton();
+});
+
+// Mobile/touch: o toque é reconhecido e faz o botão fugir.
+// O toque não aceita a ação de "Não"; ele apenas reposiciona o botão.
+btnNao?.addEventListener('touchstart', (event) => {
+  if (!isMobile()) return;
+  event.preventDefault();
+  moveNoButton();
+}, { passive: false });
+
+// Fallback para dispositivos que usam Pointer Events.
+btnNao?.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'touch') {
+    event.preventDefault();
+    moveNoButton();
+  }
+});
+
+// Desktop: clicar também faz o botão fugir.
 btnNao?.addEventListener('click', (event) => {
   if (isMobile()) return;
   event.preventDefault();
