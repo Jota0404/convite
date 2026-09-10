@@ -1,117 +1,140 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fff7f8">
-<title>Um convite para você 💌</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f7f9">
+  <title>Convite Especial 💌</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main class="app">
 
-<div id="progress-container" class="progress-container">
-  <div class="track"><div id="progress-bar"></div></div>
-  <div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-</div>
+  <main class="card-container">
+    <div class="progress-bar-container" id="progress-bar" aria-label="Progresso do convite">
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+    </div>
 
-<section id="step-intro" class="step active">
-  <div class="bubble">💌</div>
-  <p class="eyebrow">Uma pequena proposta</p>
-  <h1>Oi Duda,<br>tenho uma proposta<br>pra você 👀</h1>
-  <p>Prometo que vale a pena descobrir.</p>
-  <button id="btn-intro" class="primary">Saber mais <b>→</b></button>
-</section>
+    <div class="step active" id="step-intro">
+      <div class="header-subtitle">
+        <h2>Oi Duda, tenho uma proposta pra você 👀</h2>
+      </div>
+      <button class="btn-primary" id="btn-intro" type="button">Saber mais</button>
+    </div>
 
-<section id="step-0" class="step">
-  <div class="bubble">👀</div>
-  <p class="eyebrow">A pergunta importante</p>
-  <h1>Oi Duda!<br>Você vai sair comigo?</h1>
-  <p>Escolha com carinho. Principalmente a primeira opção. 😌</p>
-  <div class="actions">
-    <button id="btn-sim" class="primary">Sim! 💕</button>
-    <button id="btn-nao" class="secondary">Não</button>
-  </div>
-</section>
+    <div class="step" id="step-0">
+      <div class="header-subtitle">
+        <h2>Oi Duda! Você vai sair comigo? 🌹</h2>
+      </div>
+      <div class="hero-actions">
+        <button class="btn-primary" id="btn-sim" type="button">Sim!</button>
+        <button class="btn-secondary" id="btn-nao" type="button">Não</button>
+      </div>
+    </div>
 
-<section id="step-1" class="step question">
-  <small>01 / 06</small>
-  <h2>Primeiro de tudo...<br>qual é o tipo de encontro?</h2>
-  <div class="options">
-    <button class="option-card" data-question="tipoEncontro" data-value="Romântico">🌹<strong>Romântico</strong><em>Um clássico.</em></button>
-    <button class="option-card" data-question="tipoEncontro" data-value="Divertido">😂<strong>Divertido</strong><em>Rir até doer.</em></button>
-    <button class="option-card" data-question="tipoEncontro" data-value="Aventureiro">✨<strong>Aventureiro</strong><em>Vamos ver no que dá.</em></button>
-    <button class="option-card" data-question="tipoEncontro" data-value="Tranquilo">☕<strong>Tranquilo</strong><em>Sem pressa.</em></button>
-  </div>
-</section>
+    <div class="step" id="step-1">
+      <h3>Qual o tipo de rolê ideal?</h3>
+      <div class="grid-options">
+        <button class="option-card" data-key="role" data-val="Comida / Restaurante" type="button">Comida / Restaurante 🍕</button>
+        <button class="option-card" data-key="role" data-val="Café / Sobremesa" type="button">Café / Sobremesa ☕</button>
+        <button class="option-card" data-key="role" data-val="Passeio ao ar livre" type="button">Passeio ao ar livre 🧺</button>
+        <button class="option-card" data-key="role" data-val="Cinema / Exposição" type="button">Cinema / Exposição 🎬</button>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-link" data-prev="0" type="button">Voltar</button>
+        <button class="btn-primary btn-next" data-next="2" type="button" disabled>Avançar</button>
+      </div>
+    </div>
 
-<section id="step-2" class="step question">
-  <small>02 / 06</small>
-  <h2>Agora uma importante...<br>como vamos de roupa?</h2>
-  <div class="options">
-    <button class="option-card" data-question="estiloRoupa" data-value="Casual">👕<strong>Casual</strong><em>Conforto acima de tudo.</em></button>
-    <button class="option-card" data-question="estiloRoupa" data-value="Arrumadinho">✨<strong>Arrumadinho</strong><em>Um esforço moderado.</em></button>
-    <button class="option-card" data-question="estiloRoupa" data-value="Elegante">👗<strong>Elegante</strong><em>Hoje é dia de impressionar.</em></button>
-    <button class="option-card" data-question="estiloRoupa" data-value="Surpresa">🎁<strong>Surpresa</strong><em>Descobrimos na hora.</em></button>
-  </div>
-</section>
+    <div class="step" id="step-2">
+      <h3>Qual a vibe da música?</h3>
+      <div class="grid-options">
+        <button class="option-card" data-key="musica" data-val="MPB / Indie" type="button">MPB / Indie 🎧</button>
+        <button class="option-card" data-key="musica" data-val="Pop / R&amp;B" type="button">Pop / R&amp;B 🎵</button>
+        <button class="option-card" data-key="musica" data-val="Rock / Alternativo" type="button">Rock / Alternativo 🎸</button>
+        <button class="option-card" data-key="musica" data-val="Sertanejo / Pagode" type="button">Sertanejo / Pagode 🎤</button>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-link" data-prev="1" type="button">Voltar</button>
+        <button class="btn-primary btn-next" data-next="3" type="button" disabled>Avançar</button>
+      </div>
+    </div>
 
-<section id="step-3" class="step question">
-  <small>03 / 06</small>
-  <h2>E o transporte?<br>Como prefere?</h2>
-  <div class="options">
-    <button class="option-card" data-question="transporte" data-value="Carro">🚗<strong>Carro</strong><em>Conforto e praticidade.</em></button>
-    <button class="option-card" data-question="transporte" data-value="Uber">🚕<strong>Uber</strong><em>Sem preocupação.</em></button>
-    <button class="option-card" data-question="transporte" data-value="A pé">🚶<strong>A pé</strong><em>Se for pertinho.</em></button>
-    <button class="option-card" data-question="transporte" data-value="Você decide">👀<strong>Você decide</strong><em>Confio em você.</em></button>
-  </div>
-</section>
+    <div class="step" id="step-3">
+      <h3>Qual o melhor horário?</h3>
+      <div class="grid-options">
+        <button class="option-card" data-key="horario" data-val="Manhã / Almoço" type="button">Manhã / Almoço ☀️</button>
+        <button class="option-card" data-key="horario" data-val="Fim de tarde / Pôr do sol" type="button">Fim de tarde 🌅</button>
+        <button class="option-card" data-key="horario" data-val="Noite" type="button">Noite 🌙</button>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-link" data-prev="2" type="button">Voltar</button>
+        <button class="btn-primary btn-next" data-next="4" type="button" disabled>Avançar</button>
+      </div>
+    </div>
 
-<section id="step-4" class="step question">
-  <small>04 / 06</small>
-  <h2>Qual o nível de animação<br>que você quer?</h2>
-  <div class="options">
-    <button class="option-card" data-question="nivelAnimacao" data-value="Tranquilo">🌙<strong>Tranquilo</strong><em>Uma noite leve.</em></button>
-    <button class="option-card" data-question="nivelAnimacao" data-value="Moderado">✨<strong>Moderado</strong><em>Um pouco de tudo.</em></button>
-    <button class="option-card" data-question="nivelAnimacao" data-value="Animado">🎉<strong>Animado</strong><em>Hoje ninguém fica parado.</em></button>
-    <button class="option-card" data-question="nivelAnimacao" data-value="Caótico">🔥<strong>Caótico</strong><em>Que Deus nos ajude.</em></button>
-  </div>
-</section>
+    <div class="step" id="step-4">
+      <h3>Preferência de comida?</h3>
+      <div class="grid-options">
+        <button class="option-card" data-key="comida" data-val="Japonesa / Sushi" type="button">Japonesa / Sushi 🍣</button>
+        <button class="option-card" data-key="comida" data-val="Hambúrguer / Pizza" type="button">Hambúrguer / Pizza 🍔</button>
+        <button class="option-card" data-key="comida" data-val="Massa / Italiano" type="button">Massa / Italiano 🍝</button>
+        <button class="option-card" data-key="comida" data-val="Doces / Cafeteria" type="button">Doces / Cafeteria 🍰</button>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-link" data-prev="3" type="button">Voltar</button>
+        <button class="btn-primary btn-next" data-next="5" type="button" disabled>Avançar</button>
+      </div>
+    </div>
 
-<section id="step-5" class="step question">
-  <small>05 / 06</small>
-  <h2>Tem algum pedido especial<br>para esse encontro?</h2>
-  <div class="options">
-    <button class="option-card" data-question="pedidoEspecial" data-value="Nada especial">😌<strong>Nada especial</strong><em>Só aproveitar.</em></button>
-    <button class="option-card" data-question="pedidoEspecial" data-value="Tenho uma ideia">💡<strong>Tenho uma ideia</strong><em>Quero sugerir algo.</em></button>
-    <button class="option-card" data-question="pedidoEspecial" data-value="Quero ser surpreendida">🎁<strong>Me surpreenda</strong><em>Confio no planejamento.</em></button>
-    <button class="option-card" data-question="pedidoEspecial" data-value="Vou contar pessoalmente">🤫<strong>Conto pessoalmente</strong><em>É segredo.</em></button>
-  </div>
-</section>
+    <div class="step" id="step-5">
+      <h3>Quem paga a conta?</h3>
+      <div class="grid-options">
+        <button class="option-card" data-key="conta" data-val="Você (o convidante)" type="button">Você paga tudo 🎟️</button>
+        <button class="option-card" data-key="conta" data-val="Dividimos" type="button">Dividimos 50/50 🤝</button>
+        <button class="option-card" data-key="conta" data-val="Pedra, papel e tesoura" type="button">Pedra, papel ou tesoura ✂️</button>
+      </div>
+      <div class="footer-nav">
+        <button class="btn-link" data-prev="4" type="button">Voltar</button>
+        <button class="btn-primary btn-next" data-next="6" type="button" disabled>Avançar</button>
+      </div>
+    </div>
 
-<section id="step-6" class="step">
-  <small>06 / 06</small>
-  <h2>Agora falta só<br>escolher o dia. 💕</h2>
-  <p>Qual dessas opções funciona melhor para você?</p>
-  <div id="date-options"></div>
-  <div class="divider">ou escolha outra data</div>
-  <label for="custom-date">Outra data</label>
-  <input id="custom-date" type="date">
-  <button id="btn-finalizar" class="primary" disabled>Enviar 💌</button>
-</section>
+    <div class="step" id="step-6">
+      <div class="header-subtitle">
+        <h2>Sim! 🎉</h2>
+        <p>Só mais uma perguntinha e o encontro está pronto!</p>
+      </div>
+      <h3>Qual dia funciona pra você?</h3>
 
-<section id="step-7" class="step success">
-  <div class="bubble">💖</div>
-  <p class="eyebrow">Convite aceito</p>
-  <h1>Tudo pronto! 🎉</h1>
-  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Gatinho fofo">
-  <p>Esta é exatamente a experiência que o seu convite proporcionaria a ela.</p>
-</section>
+      <div class="grid-options single-col" id="dates-container" aria-label="Datas sugeridas"></div>
 
-</main>
-<script src="script.js"></script>
+      <p class="custom-date-label">Ou escolha um dia que funcione melhor para você:</p>
+      <input type="date" id="custom-date-input" class="date-input" aria-label="Escolha outra data">
+
+      <div class="footer-nav">
+        <button class="btn-link" data-prev="5" type="button">Voltar</button>
+        <button class="btn-primary btn-next" id="btn-finalizar" type="button" disabled>Enviar</button>
+      </div>
+    </div>
+
+    <div class="step" id="step-7">
+      <div class="header-subtitle">
+        <h2>Tudo pronto! 🎉</h2>
+        <p>Enviamos suas respostas. Até breve!</p>
+      </div>
+      <div class="illustrations">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZneXZ3bnhsbW54bzN3M3EzYjlqNDMxaThqOHJveWdyZHFmdXJ2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif" alt="Gatinho fofo">
+      </div>
+      <p class="final-caption">Esta é exatamente a experiência que o seu convite proporcionaria a ela.</p>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
