@@ -1,18 +1,11 @@
 const SUPABASE_URL = 'https://baajhgfklomqyrsxrbnu.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_-n8uqmAGH1UeAzLYvxuySA_eHnlSi8m';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const supabaseClient = window.supabase?.createClient
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
 
-const answers = {
-  role: '',
-  musica: '',
-  horario: '',
-  comida: '',
-  conta: '',
-  dia: ''
-};
-
+const answers = { role: '', musica: '', horario: '', comida: '', conta: '', dia: '' };
 let currentStep = 'intro';
-
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 
@@ -26,29 +19,25 @@ function goToStep(step) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function nextStep(step) { goToStep(step); }
-function prevStep(step) { goToStep(step); }
-
 function updateProgressBar() {
   const progressBar = $('#progress-bar');
   if (!progressBar) return;
-
   const visible = typeof currentStep === 'number' && currentStep >= 1 && currentStep <= 6;
   progressBar.classList.toggle('visible', visible);
   if (!visible) return;
-
   progressBar.querySelectorAll('.progress-step').forEach((element, index) => {
     element.classList.toggle('active', index < currentStep);
   });
 }
 
-$('#btn-intro')?.addEventListener('click', () => nextStep(0));
-$('#btn-sim')?.addEventListener('click', () => nextStep(1));
+$('#btn-intro')?.addEventListener('click', () => goToStep(0));
+$('#btn-sim')?.addEventListener('click', () => goToStep(1));
 
 const btnNao = $('#btn-nao');
+const isMobile = () => window.matchMedia('(max-width: 767px)').matches || navigator.maxTouchPoints > 0;
 
 function moveNoButton() {
-  if (!btnNao) return;
+  if (!btnNao || isMobile()) return;
   const margin = 12;
   const width = Math.max(btnNao.offsetWidth, 90);
   const height = Math.max(btnNao.offsetHeight, 50);
@@ -63,11 +52,8 @@ function moveNoButton() {
 }
 
 btnNao?.addEventListener('mouseenter', moveNoButton);
-btnNao?.addEventListener('touchstart', (event) => {
-  event.preventDefault();
-  moveNoButton();
-}, { passive: false });
 btnNao?.addEventListener('click', (event) => {
+  if (isMobile()) return;
   event.preventDefault();
   moveNoButton();
 });
@@ -78,23 +64,21 @@ $$('.option-card').forEach((card) => {
     const value = card.dataset.val;
     const step = card.closest('.step');
     if (!key || !step) return;
-
     step.querySelectorAll('.option-card').forEach((option) => option.classList.remove('selected'));
     card.classList.add('selected');
     answers[key] = value || '';
-
     const nextButton = step.querySelector('.btn-next');
     if (nextButton) nextButton.disabled = false;
   });
 });
 
 $$('[data-prev]').forEach((button) => {
-  button.addEventListener('click', () => prevStep(Number(button.dataset.prev)));
+  button.addEventListener('click', () => goToStep(Number(button.dataset.prev)));
 });
 
 $$('[data-next]').forEach((button) => {
   button.addEventListener('click', () => {
-    if (!button.disabled) nextStep(Number(button.dataset.next));
+    if (!button.disabled) goToStep(Number(button.dataset.next));
   });
 });
 
@@ -102,17 +86,9 @@ const customDate = $('#custom-date-input');
 const datesContainer = $('#dates-container');
 const btnFinalizar = $('#btn-finalizar');
 
-function dateOnly(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function toISODate(date) {
-  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
-}
-
-function formatLongDate(date) {
-  return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date);
-}
+function dateOnly(date) { return new Date(date.getFullYear(), date.getMonth(), date.getDate()); }
+function toISODate(date) { return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-'); }
+function formatLongDate(date) { return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date); }
 
 function getNextWeekday(baseDate, targetDay) {
   const date = dateOnly(baseDate);
@@ -124,7 +100,7 @@ function getNextWeekday(baseDate, targetDay) {
 
 function setDateSelection(value) {
   answers.dia = value;
-  btnFinalizar.disabled = !value;
+  if (btnFinalizar) btnFinalizar.disabled = !value;
 }
 
 function selectSuggestedDate(value, button) {
@@ -138,12 +114,10 @@ function generateDynamicDates() {
   if (!datesContainer) return;
   const today = dateOnly(new Date());
   datesContainer.innerHTML = '';
-
   [5, 6, 0].forEach((targetDay) => {
     const date = getNextWeekday(today, targetDay);
     const isoDate = toISODate(date);
     const label = formatLongDate(date);
-
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'date-option';
@@ -152,33 +126,32 @@ function generateDynamicDates() {
     button.addEventListener('click', () => selectSuggestedDate(isoDate, button));
     datesContainer.appendChild(button);
   });
-
   if (customDate) customDate.min = toISODate(today);
 }
 
 customDate?.addEventListener('change', (event) => {
   const value = event.target.value;
-  if (!value) {
-    setDateSelection('');
-    return;
-  }
+  if (!value) { setDateSelection(''); return; }
   $$('.date-option').forEach((option) => option.classList.remove('selected'));
   setDateSelection(value);
 });
 
 async function finishForm() {
   if (!answers.dia || !btnFinalizar) return;
-
+  if (!supabaseClient) {
+    alert('Não foi possível conectar ao formulário agora. Tente novamente. 💌');
+    return;
+  }
   btnFinalizar.disabled = true;
   const originalText = btnFinalizar.textContent;
   btnFinalizar.textContent = 'Enviando... 💌';
 
-  const { error } = await supabase.from('respostas_convite').insert({
-    tipo_encontro: answers.role,
-    estilo_roupa: answers.musica,
-    transporte: answers.horario,
-    nivel_animacao: answers.comida,
-    pedido_especial: answers.conta,
+  const { error } = await supabaseClient.from('respostas_convite').insert({
+    role: answers.role,
+    musica: answers.musica,
+    horario: answers.horario,
+    comida: answers.comida,
+    conta: answers.conta,
     dia_escolhido: answers.dia
   });
 
@@ -195,6 +168,5 @@ async function finishForm() {
 }
 
 btnFinalizar?.addEventListener('click', finishForm);
-
 generateDynamicDates();
 updateProgressBar();
